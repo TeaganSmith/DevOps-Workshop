@@ -21,12 +21,15 @@ install minikube-linux-amd64 /usr/local/bin/minikube
 usermod -aG docker ubuntu
 
 # Start Minikube (will run as root initially — user may need to interact after reboot)
-minikube start --driver=none
+minikube start --driver=none > /var/log/minikube-start.log 2>&1
 
+mkdir -p /home/ubuntu/.kube
+cp -i /root/.kube/config /home/ubuntu/.kube/config
+chown -R ubuntu:ubuntu /home/ubuntu/.kube
 # Clone your repo (replace with your actual repo URL)
 cd /home/ubuntu
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
-chown -R ubuntu:ubuntu YOUR_REPO
+git clone https://github.com/TeaganSmith/DevOps-Workshop.git
+chown -R ubuntu:ubuntu DevOps-Workshop
 
 # Optional: deploy initial service
-su - ubuntu -c "cd ~/YOUR_REPO/saas-provisioner && kubectl apply -f deployment.yaml && kubectl apply -f service.yaml"
+#su - ubuntu -c "cd ~/DevOps-Workshop/saas-provisioner && kubectl apply -f deployment.yaml && kubectl apply -f service.yaml"
