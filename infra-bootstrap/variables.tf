@@ -13,7 +13,7 @@ variable "ami_id" {
   default     = "ami-0c02fb55956c7d316" # Ubuntu Server 22.04 LTS (HVM), SSD Volume Type for us-east-1
 }
 
-variable "public_key_path" {
-  description = "Path to your local public SSH key"
-  default     = "~/.ssh/id_rsa.pub"
+resource "aws_key_pair" "deployer" {
+  key_name   = "minikube-key"
+  public_key = file("${path.module}/minikube-key.pub")
 }
