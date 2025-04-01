@@ -5,7 +5,7 @@ provider "aws" {
 }
 
 resource "aws_key_pair" "deployer" {
-  key_name   = "minikube-key"
+  key_name   = "id_rsa.pub"
   public_key = file("${path.module}/minikube-key.pub")
 }
 

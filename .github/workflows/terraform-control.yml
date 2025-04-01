@@ -1,0 +1,57 @@
+name: Terraform Control
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Terraform Action"
+        required: true
+        default: "plan"
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+
+    defaults:
+      run:
+        working-directory: infra-bootstrap
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Run Terraform Command
+        run: |
+          case "${{ github.event.inputs.action }}" in
+            plan)
+              terraform plan
+              ;;
+            apply)
+              terraform apply -auto-approve
+              ;;
+            destroy)
+              terraform destroy -auto-approve
+              ;;
+            *)
+              echo "Invalid action: ${{ github.event.inputs.action }}"
+              exit 1
+              ;;
+          esac
