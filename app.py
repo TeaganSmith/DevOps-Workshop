@@ -55,4 +55,4 @@ def provision():
     except subprocess.CalledProcessError:
         return f"<h3>Failed to provision infrastructure for {client_name}</h3><a href='/'>Try again</a>"
 
-    return f"<h3>Provisioned infrastructure for {client_name}!</h3><a href='/'>Back</a>"
+    return f"<h3>Provisioned infrastructure for {client_name} successfully!</h3><a href='/'>Back</a>"
