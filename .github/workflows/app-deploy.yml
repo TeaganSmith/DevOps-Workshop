@@ -25,5 +25,6 @@ jobs:
           script: |
             cd ~/DevOps-Workshop
             git pull origin main
+            sudo systemctl enable flask-app.service
             sudo systemctl restart flask-app.service
             sudo systemctl status flask-app.service --no-pager

@@ -6,11 +6,11 @@ provider "aws" {
 
 resource "aws_key_pair" "deployer" {
   key_name   = "id_rsa.pub"
-  public_key = file("${path.module}/minikube-key.pub")
+  public_key = file("${path.module}/infra-key.pub")
 }
 
-resource "aws_security_group" "minikube_sg" {
-  name        = "minikube-sg"
+resource "aws_security_group" "infra-provisioner_sg" {
+  name        = "infra-provisioner"
   description = "Allow SSH and NodePort access"
 
   ingress {
