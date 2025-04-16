@@ -30,7 +30,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/$teagansmith/flask-saas:latest
+          tags: ghcr.io/teagansmith/flask-saas:latest
 
       - name: SSH into EC2 & Deploy
         uses: appleboy/ssh-action@v1.0.0
