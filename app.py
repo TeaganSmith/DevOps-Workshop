@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template
 import os, json, subprocess
+from dotenv import load_dotenv
+load_dotenv("/home/ubuntu/DevOps-Workshop/.env")
 
 app = Flask(__name__)
 
