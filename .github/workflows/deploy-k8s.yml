@@ -46,10 +46,10 @@ jobs:
             docker pull ghcr.io/teagansmith/flask-saas:latest
             minikube image load ghcr.io/teagansmith/flask-saas:latest
             # check if deployment exists
-            if kubectl get deployment flask-saas >/dev/null 2>&1; then
+            if minikube kubectl get deployment flask-saas >/dev/null 2>&1; then
                 echo "Deployment exists — restarting"
-                kubectl rollout restart deployment flask-saas
+                minikube kubectl rollout restart deployment flask-saas
             else
                 echo "Deployment not found — applying"
-                kubectl apply -f deployment.yaml
+                minikube kubectl apply -f deployment.yaml
             fi
