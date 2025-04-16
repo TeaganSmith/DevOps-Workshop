@@ -3,7 +3,7 @@
 # System Update & Core Packages
 apt-get update -y
 apt-get upgrade -y
-apt-get install -y python3 python3-pip git nginx
+apt-get install -y python3 python3-pip git nginx dotenv
 
 # Install Flask
 pip3 install flask
