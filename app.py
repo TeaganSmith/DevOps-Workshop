@@ -4,8 +4,8 @@ import os, json, subprocess
 app = Flask(__name__)
 
 # Constants
-BASE_STATE_DIR = "/infra/client-state"     # Stores per-client tfvars/backend
-TERRAFORM_DIR = "/infra"                   # Contains main.tf and variables.tf
+BASE_STATE_DIR = "/home/ubuntu/DevOps-Workshop/infra/client-state"     # Stores per-client tfvars/backend
+TERRAFORM_DIR = "/home/ubuntu/DevOps-Workshop/infra"                   # Contains main.tf and variables.tf
 
 @app.route('/')
 def form():
