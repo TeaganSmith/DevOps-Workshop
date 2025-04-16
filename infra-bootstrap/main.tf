@@ -51,5 +51,5 @@ resource "aws_instance" "infra-provisioner_host" {
 }
 
 output "ec2_public_ip" {
-  value = aws_instance.infra-provisioner.public_ip
+  value = aws_instance.infra-provisioner_sg.public_ip
 }
