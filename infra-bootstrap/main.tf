@@ -36,17 +36,17 @@ resource "aws_security_group" "infra-provisioner_sg" {
   }
 }
 
-resource "aws_instance" "minikube_host" {
+resource "aws_instance" "infra-provisioner_host" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
   key_name                    = aws_key_pair.deployer.key_name
-  vpc_security_group_ids      = [aws_security_group.minikube_sg.id]
+  vpc_security_group_ids      = [aws_security_group.infra-provisioner_sg.id]
   associate_public_ip_address = true
 
   user_data = file("cloud-init.sh")
 
   tags = {
-    Name = "MinikubeHost"
+    Name = "InfraProvisioner"
   }
 }
 
