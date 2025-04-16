@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 import os, json, subprocess
+import shutil
 from dotenv import load_dotenv
 load_dotenv("/home/ubuntu/DevOps-Workshop/.env")
 
@@ -103,6 +104,7 @@ def destroy(client_name):
             check=True
         )
         flash(f"Infrastructure destroyed for {client_name}.", "success")
+        shutil.rmtree(client_dir)
     except subprocess.CalledProcessError:
         flash(f"Destruction failed for {client_name}.", "error")
 
