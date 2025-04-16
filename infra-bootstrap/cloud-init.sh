@@ -4,6 +4,7 @@
 apt-get update -y
 apt-get upgrade -y
 apt-get install -y python3 python3-pip git nginx
+snap install terraform --classic
 
 # Install Flask
 pip3 install flask dotenv
