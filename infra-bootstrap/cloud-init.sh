@@ -22,7 +22,6 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/DevOps-Workshop
-EnvironmentFile=/home/ubuntu/DevOps-Workshop/.env
 ExecStart=/usr/bin/python3 /home/ubuntu/DevOps-Workshop/app.py
 Restart=always
 Environment="PYTHONUNBUFFERED=1"
