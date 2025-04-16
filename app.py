@@ -50,6 +50,9 @@ def provision():
         json.dump(backend, f)
 
     # Run Terraform commands
+    env = os.environ.copy()
+    env["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
+    env["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
     try:
         subprocess.run(
             ["terraform", "init", "-reconfigure", f"-backend-config={os.path.join(client_dir, 'backend.tf.json')}"],
