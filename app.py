@@ -57,11 +57,13 @@ def status():
     try:
         result = subprocess.run(["terraform", "workspace", "list"],
                                 cwd=TERRAFORM_DIR, env=env, capture_output=True, text=True)
-        workspaces = [
-            ws.strip().replace("*", "").strip()
-            for ws in result.stdout.splitlines()
-            if ws.strip() not in ("default", "")
-        ]
+        raw_workspaces = result.stdout.splitlines()
+        workspaces = []
+
+        for ws in raw_workspaces:
+            cleaned = ws.replace("*", "").strip()
+            if cleaned and cleaned.lower() != "default":
+                workspaces.append(cleaned)
     except subprocess.CalledProcessError:
         workspaces = []
 
