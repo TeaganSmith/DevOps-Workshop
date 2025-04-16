@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Provisioned Infrastructure</title>
+</head>
+<body>
+    <h2>Provisioned Infrastructure</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li><strong>{{ category.capitalize() }}:</strong> {{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    {% if clients %}
+        <ul>
+            {% for client in clients %}
+                <li>
+                    {{ client }}
+                    <form method="POST" action="/destroy/{{ client }}" style="display:inline;">
+                        <button type="submit">Destroy</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No infrastructure provisioned yet.</p>
+    {% endif %}
+
+    <a href="/">Back to form</a>
+</body>
+</html>
