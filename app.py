@@ -66,7 +66,7 @@ def provision():
     except subprocess.CalledProcessError:
         return f"<h3>Provisioning failed for {client_name}</h3><a href='/'>Try again</a>"
 
-    return f"<h3>Infrastructure provisioned for {client_name}!</h3><a href='/'>Back</a>"
+    return f"<h3>Infrastructure provisioned for {client_name}!!</h3><a href='/'>Back</a>"
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
