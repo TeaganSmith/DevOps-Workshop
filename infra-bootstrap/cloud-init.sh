@@ -3,10 +3,10 @@
 # System Update & Core Packages
 apt-get update -y
 apt-get upgrade -y
-apt-get install -y python3 python3-pip git nginx dotenv
+apt-get install -y python3 python3-pip git nginx
 
 # Install Flask
-pip3 install flask
+pip3 install flask dotenv
 
 # Clone your app
 cd /home/ubuntu
