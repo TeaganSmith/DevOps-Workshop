@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for, flash
 import os, json, subprocess
 from dotenv import load_dotenv
 load_dotenv("/home/ubuntu/DevOps-Workshop/.env")
@@ -70,6 +70,44 @@ def provision():
         return f"<h3>Provisioning failed for {client_name}</h3><a href='/'>Try again</a>"
 
     return f"<h3>Infrastructure provisioned for {client_name}!!</h3><a href='/'>Back</a>"
+
+@app.route('/status')
+def status():
+    clients = []
+    if os.path.exists(BASE_STATE_DIR):
+        for name in os.listdir(BASE_STATE_DIR):
+            path = os.path.join(BASE_STATE_DIR, name, "terraform.tfvars.json")
+            if os.path.isfile(path):
+                clients.append(name)
+    return render_template("status.html", clients=clients)
+
+@app.route('/destroy/<client_name>', methods=['POST'])
+def destroy(client_name):
+    client_dir = os.path.join(BASE_STATE_DIR, client_name)
+
+    env = os.environ.copy()
+    env["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
+    env["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
+    env["AWS_REGION"] = os.getenv("AWS_REGION")
+
+    try:
+        subprocess.run(
+            ["terraform", "init", "-reconfigure", f"-backend-config={os.path.join(client_dir, 'backend.tf.json')}"],
+            cwd=TERRAFORM_DIR,
+            env=env,
+            check=True
+        )
+        subprocess.run(
+            ["terraform", "destroy", "-auto-approve", f"-var-file={os.path.join(client_dir, 'terraform.tfvars.json')}"],
+            cwd=TERRAFORM_DIR,
+            env=env,
+            check=True
+        )
+        flash(f"Infrastructure destroyed for {client_name}.", "success")
+    except subprocess.CalledProcessError:
+        flash(f"Destruction failed for {client_name}.", "error")
+
+    return redirect(url_for('status'))
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
