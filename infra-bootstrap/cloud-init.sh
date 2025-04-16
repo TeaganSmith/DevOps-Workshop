@@ -50,4 +50,6 @@ server {
 }
 EOF
 
-ln -s /etc/nginx/sites-available/flask /
+ln -sf /etc/nginx/sites-available/flask /etc/nginx/sites-enabled/flask
+rm -f /etc/nginx/sites-enabled/default
+sudo systemctl reload nginx
