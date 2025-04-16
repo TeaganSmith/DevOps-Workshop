@@ -30,7 +30,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/flask-saas:latest
+          tags: ghcr.io/$teagansmith/flask-saas:latest
 
       - name: SSH into EC2 & Deploy
         uses: appleboy/ssh-action@v1.0.0
@@ -39,8 +39,8 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_DEPLOY_KEY }}
           script: |
-            docker pull ghcr.io/${{ github.repository_owner }}/flask-saas:latest
-            minikube image load ghcr.io/${{ github.repository_owner }}/flask-saas:latest
+            docker pull ghcr.io/teagansmith/flask-saas:latest
+            minikube image load ghcr.io/teagansmith/flask-saas:latest
             # check if deployment exists
             if kubectl get deployment flask-saas >/dev/null 2>&1; then
                 echo "Deployment exists — restarting"
