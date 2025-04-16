@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv("/home/ubuntu/DevOps-Workshop/.env")
 
 app = Flask(__name__)
-
+app.secret_key = os.getenv("FLASK_SECRET", "supersecretkey123")
 # Constants
 BASE_STATE_DIR = "/home/ubuntu/DevOps-Workshop/infra/client-state"     # Stores per-client tfvars/backend
 TERRAFORM_DIR = "/home/ubuntu/DevOps-Workshop/infra"                   # Contains main.tf and variables.tf
