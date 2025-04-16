@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-saas
+  labels:
+    app: flask-saas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-saas
+  template:
+    metadata:
+      labels:
+        app: flask-saas
+    spec:
+      containers:
+        - name: flask-saas
+          image: ghcr.io/teagansmith/flask-saas:latest  # Replace with your GHCR repo if different
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-saas-service
+spec:
+  selector:
+    app: flask-saas
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+      nodePort: 30500

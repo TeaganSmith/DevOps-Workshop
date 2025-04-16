@@ -1,0 +1,51 @@
+# .github/workflows/deploy-k8s.yml
+
+name: Build & Deploy to Minikube
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/flask-saas:latest
+
+      - name: SSH into EC2 & Deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_DEPLOY_KEY }}
+          script: |
+            docker pull ghcr.io/${{ github.repository_owner }}/flask-saas:latest
+            minikube image load ghcr.io/${{ github.repository_owner }}/flask-saas:latest
+            # check if deployment exists
+            if kubectl get deployment flask-saas >/dev/null 2>&1; then
+                echo "Deployment exists — restarting"
+                kubectl rollout restart deployment flask-saas
+            else
+                echo "Deployment not found — applying"
+                kubectl apply -f deployment.yaml
+            fi
