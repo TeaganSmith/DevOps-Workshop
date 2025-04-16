@@ -50,13 +50,6 @@ def provision():
         json.dump(backend, f)
 
     # Run Terraform commands
-    env = os.environ.copy()
-    required_envs = ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
-    for var in required_envs:
-        val = os.getenv(var)
-    if val is None:
-        return f"<h3>Missing environment variable: {var}. Please check your .env file.</h3><a href='/'>Back</a>"
-    env[var] = val
     try:
         subprocess.run(
             ["terraform", "init", "-reconfigure", f"-backend-config={os.path.join(client_dir, 'backend.tf.json')}"],
