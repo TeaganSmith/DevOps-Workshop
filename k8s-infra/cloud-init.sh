@@ -1,53 +1,77 @@
 #!/bin/bash
 set -euxo pipefail
+exec > /var/log/cloud-init-output.log 2>&1    # everything goes to the log
 
-# Update system and install essentials
+###############################################################################
+# 1.  OS packages & Docker
+###############################################################################
 apt-get update -y
 apt-get upgrade -y
-apt-get install -y curl apt-transport-https ca-certificates gnupg lsb-release software-properties-common docker.io conntrack socat jq git make gcc g++ golang-go
+apt-get install -y \
+  curl ca-certificates gnupg lsb-release software-properties-common \
+  docker.io conntrack socat jq git make gcc g++ golang-go
 
-# Enable Docker
-systemctl enable docker
-systemctl start docker
+systemctl enable --now docker
 
-# Install Terraform via Snap
+###############################################################################
+# 2.  Terraform   (snap is fine)
+###############################################################################
 snap install terraform --classic
+command -v terraform >/dev/null       # abort if missing
 
-# Install kubectl
-KUBECTL_VERSION=$(curl -s https://dl.k8s.io/release/stable.txt)
-curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-rm kubectl
+###############################################################################
+# 3.  kubectl     (official apt repo – avoids 404 problems)
+###############################################################################
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | \
+      gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] \
+      https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" \
+      >/etc/apt/sources.list.d/kubernetes.list
+apt-get update -y
+apt-get install -y kubectl
+command -v kubectl >/dev/null
 
-# Install Minikube
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-install -o root -g root -m 0755 minikube-linux-amd64 /usr/local/bin/minikube
-rm minikube-linux-amd64
+###############################################################################
+# 4.  Minikube   (official .deb package)
+###############################################################################
+curl -fsSL https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb \
+     -o /tmp/minikube.deb
+dpkg -i /tmp/minikube.deb
+rm /tmp/minikube.deb
+command -v minikube >/dev/null
 
-# Install crictl
+###############################################################################
+# 5.  crictl
+###############################################################################
 CRICTL_VERSION="v1.29.0"
-curl -LO https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
-tar -C /usr/local/bin -xzf crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
-rm crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
+curl -fsSL https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz \
+ | tar -C /usr/local/bin -xz --strip-components=1
+command -v crictl >/dev/null
 
-# Install cri-dockerd
-git clone https://github.com/Mirantis/cri-dockerd.git /opt/cri-dockerd
+###############################################################################
+# 6.  cri‑dockerd
+###############################################################################
+git clone --depth=1 https://github.com/Mirantis/cri-dockerd.git /opt/cri-dockerd
 cd /opt/cri-dockerd
-go mod tidy || true
-go build -o bin/cri-dockerd
-install -o root -g root -m 0755 bin/cri-dockerd /usr/local/bin/cri-dockerd
+go build -o cri-dockerd
+install -o root -g root -m 0755 cri-dockerd /usr/local/bin/cri-dockerd
 
-# Set up cri-dockerd as a service
 cp -a packaging/systemd/* /etc/systemd/system
 sed -i 's:/usr/bin/cri-dockerd:/usr/local/bin/cri-dockerd:' /etc/systemd/system/cri-docker.service
-systemctl daemon-reexec
 systemctl daemon-reload
 systemctl enable --now cri-docker.socket
+command -v cri-dockerd >/dev/null
 
-# Start Minikube
-minikube start --driver=none --container-runtime=docker --cri-socket=unix:///var/run/cri-dockerd.sock
+###############################################################################
+# 7.  Start Minikube (none driver + Docker runtime)
+###############################################################################
+minikube start --driver=none \
+               --container-runtime=docker \
+               --cri-socket=unix:///var/run/cri-dockerd.sock
 
-# Deploy sample app (KUARD)
+###############################################################################
+# 8.  Deploy KUARD demo app
+###############################################################################
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Pod
@@ -60,3 +84,4 @@ spec:
     ports:
     - containerPort: 8080
 EOF
+echo "✅ setup finished"
