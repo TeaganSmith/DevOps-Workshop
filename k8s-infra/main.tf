@@ -45,6 +45,10 @@ resource "aws_instance" "minikube_host" {
   vpc_security_group_ids      = [aws_security_group.minikube_sg.id]
   associate_public_ip_address = true
 
+  root_block_device {
+  volume_size = 30  # or 50 GB
+  }
+
   user_data = file("${path.module}/cloud-init.sh")
 
   tags = {
