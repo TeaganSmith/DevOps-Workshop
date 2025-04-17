@@ -18,6 +18,6 @@ resource "aws_dynamodb_table" "tf-locks" {
 }
 
 resource "aws_s3_bucket" "tf_state" {
-  bucket         = "devops-tf-state-teagan" # Must be globally unique
+  bucket         = "devops-teagan" # Must be globally unique
   force_destroy  = true
 }

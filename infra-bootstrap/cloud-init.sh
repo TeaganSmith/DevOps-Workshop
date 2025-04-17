@@ -11,7 +11,7 @@ pip3 install flask dotenv
 
 # Clone your app
 cd /home/ubuntu
-git clone https://github.com/TeaganSmith/DevOps-Workshop.git
+git clone https://github.com/TODO/DevOps-Workshop.git
 chown -R ubuntu:ubuntu DevOps-Workshop
 
 # Create systemd service for Flask

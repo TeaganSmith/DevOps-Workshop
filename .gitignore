@@ -2,3 +2,4 @@
 terraform.tfvars.json
 *.tfstate*
 .terraform*
+*.pub
