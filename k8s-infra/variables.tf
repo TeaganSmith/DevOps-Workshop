@@ -19,5 +19,5 @@ variable "instance_type" {
 variable "public_key_path" {
   description = "Path to your SSH public key"
   type        = string
-  default     = "${path.module}/infra-key.pub"
+  default     = "./infra-key.pub"
 }
