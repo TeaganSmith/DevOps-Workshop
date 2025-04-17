@@ -1,0 +1,27 @@
+name: Ruff Code Linting
+
+on:
+  pull_request:
+    branches: [dev]
+
+jobs:
+  ruff-lint:
+    name: Ruff Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Install reviewdog
+        run: |
+          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Run ruff with reviewdog
+        run: |
+          ruff . --output-format=github | reviewdog -f=github -name="ruff" -reporter=github-pr-review -fail-on-error=true
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
